@@ -6,6 +6,20 @@
     "analytics": "317ac94c-58e6-475f-b67b-770a1f5f4a86"
   },
   "newProjectRoot": "projects",
+  "schematics": {
+    "@schematics/angular:component": {
+      "skipTests": true
+    },
+    "@schematics/angular:service": {
+      "skipTests": true
+    },
+    "@schematics/angular:pipe": {
+      "skipTests": true
+    },
+    "@schematics/angular:directive": {
+      "skipTests": true
+    }
+  },
   "projects": {
     "cashpilot-frontend": {
       "projectType": "application",
