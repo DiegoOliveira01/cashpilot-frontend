@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router'
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
 
@@ -13,7 +14,10 @@ export class LoginComponent {
   password = '';
   errormessage = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+  private authService: AuthService,
+  private router: Router
+  ) {}
 
   onLogin() {
     this.errormessage = '';
@@ -27,6 +31,8 @@ export class LoginComponent {
 
         // Salva token
         localStorage.setItem('token', response.token);
+
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         console.error(err);
