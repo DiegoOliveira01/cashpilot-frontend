@@ -1,0 +1,19 @@
+<nav style="display:flex; gap:20px; padding:10px; background:#eee;">
+
+  <a routerLink="/">Home</a>
+
+  <!-- NÃO LOGADO -->
+  <a *ngIf="!authService.isLogged()" routerLink="/login">
+    Login
+  </a>
+
+  <!-- LOGADO -->
+  <a *ngIf="authService.isLogged()" routerLink="/dashboard">
+    Dashboard
+  </a>
+
+  <button *ngIf="authService.isLogged()" (click)="logout()">
+    Sair
+  </button>
+
+</nav>

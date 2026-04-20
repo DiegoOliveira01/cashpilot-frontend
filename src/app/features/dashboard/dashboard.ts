@@ -1,23 +1,19 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../../core/services/auth';
-import { Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TransactionService } from '../../core/services/transaction';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  template: `<h1>Dashboard (logado)</h1> <button (click)="logout()">Sair</button>`
+  imports: [CommonModule],
+  templateUrl: './dashboard.html'
 })
 export class DashboardComponent {
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private transactionService = inject(TransactionService);
 
-  logout(){
-    this.authService.logout();
+  transactions = toSignal(this.transactionService.getAll(), { initialValue: [] });
+  summary = toSignal(this.transactionService.getSummary());
 
-    // REDIRECT
-    this.router.navigate(['/login']);
-  }
 }

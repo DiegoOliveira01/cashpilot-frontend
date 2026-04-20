@@ -1,1 +1,14 @@
-<button (click)="logout()">Sairr</button>
+<h1>Dashboard funcionando</h1>
+
+<ng-container *ngIf="summary()">
+  <p>Receitas: {{ summary()?.income }}</p>
+  <p>Despesas: {{ summary()?.expense }}</p>
+  <p>Saldo: {{ summary()?.balance }}</p>
+</ng-container>
+
+<p>Quantidade: {{ transactions().length }}</p>
+<ul>
+  <li *ngFor="let t of transactions()">
+    {{ t.description }} — {{ t.amount }}
+  </li>
+</ul>
