@@ -1,0 +1,40 @@
+<h2>Nova Transação</h2>
+
+<form (ngSubmit)="submit()">
+
+    <div>
+        <label>Descrição</label>
+        <input 
+            [(ngModel)]="form.description"
+            name="description"
+            required />
+    </div>
+    <div>
+        <label>Valor</label>
+        <input 
+            type="number"
+            [(ngModel)]="form.amount" 
+            name="amount" 
+            required />
+  </div>
+
+  <div>
+    <label>Tipo</label>
+    <select [(ngModel)]="form.type" name="type">
+      <option value="INCOME">Receita</option>
+      <option value="EXPENSE">Despesa</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Data</label>
+    <input 
+      type="date"
+      [(ngModel)]="form.date" 
+      name="date" 
+      required />
+  </div>
+
+  <button type="submit">Salvar</button>
+
+</form>

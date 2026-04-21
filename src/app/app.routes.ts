@@ -17,5 +17,22 @@ export const routes: Routes = [
         .then(m => m.DashboardComponent)
   },
 
+  {
+    path: 'transactions/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/transactions/pages/create-transaction/create-transaction')
+    .then(m => m.CreateTransactionComponent)
+  },
+
+  {
+    path: 'transactions/edit/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/transactions/pages/edit-transaction/edit-transaction')
+    .then(m => m.EditTransactionComponent)
+
+  },
+
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

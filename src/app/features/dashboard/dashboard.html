@@ -7,8 +7,18 @@
 </ng-container>
 
 <p>Quantidade: {{ transactions().length }}</p>
-<ul>
-  <li *ngFor="let t of transactions()">
-    {{ t.description }} — {{ t.amount }}
-  </li>
-</ul>
+<li *ngFor="let t of transactions()">
+  {{ t.description }} — {{ t.amount }}
+
+  <button [routerLink]="['/transactions/edit', t.id]">
+    Editar
+  </button>
+
+  <button (click)="delete(t.id)">
+    Excluir
+  </button>
+</li>
+
+<button routerLink="/transactions/new">
+  Nova Transação
+</button>

@@ -29,6 +29,10 @@ export class TransactionService {
     return this.http.get<Transaction[]>(this.apiUrl);
   }
 
+  getById(id: number){
+    return this.http.get<Transaction>(`${this.apiUrl}/${id}`);
+  }
+
   getSummary(): Observable<TransactionSummary> {
     return this.http.get<TransactionSummary>(`${this.apiUrl}/summary`);
   }
@@ -36,4 +40,12 @@ export class TransactionService {
   create(data: any): Observable<Transaction> {
     return this.http.post<Transaction>(this.apiUrl, data);
   }
+
+  update(id: number, data: any) {
+    return this.http.put<Transaction>(`${this.apiUrl}/${id}`, data);
+  }
+
+  delete(id: number) {
+  return this.http.delete(`${this.apiUrl}/${id}`);
+}
 }

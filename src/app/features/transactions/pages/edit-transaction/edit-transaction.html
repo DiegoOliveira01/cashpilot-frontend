@@ -1,0 +1,20 @@
+<h2>Editar Transação</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <input formControlName="description" placeholder="Descrição" />
+
+  <input type="number" formControlName="amount" placeholder="Valor" />
+
+  <select formControlName="type">
+    <option value="INCOME">Receita</option>
+    <option value="EXPENSE">Despesa</option>
+  </select>
+
+  <input type="date" formControlName="date" />
+
+  <button type="submit" [disabled]="form.invalid">
+    Atualizar
+  </button>
+
+</form>
