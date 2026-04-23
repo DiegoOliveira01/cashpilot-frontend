@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router'
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
@@ -12,31 +12,41 @@ import { AuthService } from '../../../../core/services/auth';
 export class LoginComponent {
   email = '';
   password = '';
-  errormessage = '';
+  errorMessage = '';
 
   constructor(
   private authService: AuthService,
-  private router: Router
+  private router: Router,
+  private cdr: ChangeDetectorRef
   ) {}
 
   onLogin() {
-    this.errormessage = '';
+    
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Preencha email e senha.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.errorMessage = '';
 
     this.authService.login({
       email: this.email,
       password: this.password
     }).subscribe({
       next: (response) => {
-        console.log('Login sucesso', response);
-
         // Salva token
         localStorage.setItem('token', response.token);
 
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        console.error(err);
-        this.errormessage = 'Email ou senha inválidos';
+        if (err.status === 401 || err.status === 403) {
+          this.errorMessage = 'Email ou senha inválidos.';
+        } else {
+          this.errorMessage = 'Erro ao realizar login. Tente novamente.';
+        }
+        this.cdr.detectChanges(); // resolve o NG0100
       }
     });
   }

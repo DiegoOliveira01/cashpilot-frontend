@@ -1,19 +1,41 @@
-<nav style="display:flex; gap:20px; padding:10px; background:#eee;">
+<nav class="bg-gray-900 border-b border-gray-800 px-6 py-4">
+  <div class="max-w-4xl mx-auto flex items-center justify-between">
 
-  <a routerLink="/">Home</a>
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-2">
+      <img src="logo.png" alt="Cash Pilot" class="w-12 h-12 object-contain" />
+      <span class="text-white font-bold text-lg tracking-tight">Cash Pilot</span>
+    </a>
 
-  <!-- NÃO LOGADO -->
-  <a *ngIf="!authService.isLogged()" routerLink="/login">
-    Login
-  </a>
+    <!-- Navegação -->
+    <div class="flex items-center gap-4">
 
-  <!-- LOGADO -->
-  <a *ngIf="authService.isLogged()" routerLink="/dashboard">
-    Dashboard
-  </a>
+      <!-- NÃO LOGADO -->
+      
+      <a *ngIf="!authService.isLogged()"
+        routerLink="/login"
+        class="text-sm text-gray-400 hover:text-white font-medium transition"
+      >
+        Login
+      </a>
 
-  <button *ngIf="authService.isLogged()" (click)="logout()">
-    Sair
-  </button>
+      <!-- LOGADO -->
+      
+      <a *ngIf="authService.isLogged()"
+        routerLink="/dashboard"
+        class="text-sm text-gray-400 hover:text-white font-medium transition"
+      >
+        Dashboard
+      </a>
 
+      <button
+        *ngIf="authService.isLogged()"
+        (click)="logout()"
+        class="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white px-4 py-2 rounded-lg font-medium transition cursor-pointer"
+      >
+        Sair
+      </button>
+
+    </div>
+  </div>
 </nav>
