@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'cashpilot-backend-production.up.railway.app'
+  apiUrl: 'https://cashpilot-backend-production.up.railway.app'
 };
