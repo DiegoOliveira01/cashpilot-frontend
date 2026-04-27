@@ -22,7 +22,7 @@ export interface TransactionSummary {
 })
 export class TransactionService {
 
-  private apiUrl = environment.apiUrl;
+  private apiUrl = `${environment.apiUrl}/transactions`;
 
   constructor(private http: HttpClient) {}
 
