@@ -1,0 +1,93 @@
+<div class="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 mb-6">
+    <img
+      src="logo.png"
+      alt="Cash Pilot Logo"
+      class="w-32 h-32 object-contain"
+    />
+    <div>
+      <h1 class="text-3xl font-bold text-white tracking-tight">Cash Pilot</h1>
+      <p class="text-gray-400 text-sm">Gerencie suas finanças com simplicidade</p>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="w-full max-w-md bg-gray-900 rounded-2xl p-8 shadow-lg">
+
+    <h2 class="text-white font-semibold text-lg mb-6">Criar conta</h2>
+
+    <form (ngSubmit)="onRegister()">
+
+      <!-- Nome -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-300 mb-1">
+          Nome
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          required
+          placeholder="Seu nome completo"
+          class="w-full bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-300 mb-1">
+          Email
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          placeholder="seu@email.com"
+          class="w-full bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+        />
+      </div>
+
+      <!-- Senha -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-300 mb-1">
+          Senha
+        </label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="••••••••"
+          class="w-full bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-sm transition duration-200 cursor-pointer"
+      >
+        Criar conta
+      </button>
+
+    </form>
+
+    <!-- Erro -->
+    @if (errorMessage) {
+      <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mt-4">
+        <p class="text-sm text-red-400">{{ errorMessage }}</p>
+      </div>
+    }
+
+    <!-- Link login -->
+    <p class="mt-6 text-center text-sm text-gray-500">
+      Já tem conta?
+      <a routerLink="/login" class="text-indigo-400 hover:text-indigo-300 font-medium transition">
+        Entrar
+      </a>
+    </p>
+
+  </div>
+</div>

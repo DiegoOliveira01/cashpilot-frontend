@@ -2,8 +2,14 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/pages/login/login';
 import { authGuard } from './core/guards/auth-guard';
 import { noAuthGuard } from './core/guards/no-auth-guard';
+import { RegisterComponent } from './features/auth/pages/register/register';
 
 export const routes: Routes = [
+  
+  { path: 'register',
+    component: RegisterComponent
+  },
+  
   { path: 'login', 
     component: LoginComponent,
     canActivate: [noAuthGuard] 
