@@ -7,7 +7,8 @@ import { RegisterComponent } from './features/auth/pages/register/register';
 export const routes: Routes = [
   
   { path: 'register',
-    component: RegisterComponent
+    component: RegisterComponent,
+    canActivate: [noAuthGuard]
   },
   
   { path: 'login', 
