@@ -13,6 +13,7 @@ export class LoginComponent {
   email = '';
   password = '';
   errorMessage = '';
+  isLoading = false;
 
   constructor(
   private authService: AuthService,
@@ -29,6 +30,7 @@ export class LoginComponent {
     }
 
     this.errorMessage = '';
+    this.isLoading = true; // Ativa o loading no button
 
     this.authService.login({
       email: this.email,
@@ -38,9 +40,12 @@ export class LoginComponent {
         // Salva token
         localStorage.setItem('token', response.token);
 
+        this.isLoading = false; // Desativa o efeito de loading se sucesso
+
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
+        this.isLoading = false; // Desativa o efeito de loading no erro
         if (err.status === 401 || err.status === 403) {
           this.errorMessage = 'Email ou senha inválidos.';
         } else {

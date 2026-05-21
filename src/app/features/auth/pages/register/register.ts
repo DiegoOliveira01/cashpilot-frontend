@@ -14,6 +14,8 @@ export class RegisterComponent {
   email = '';
   password = '';
   errorMessage = '';
+  sucessMessage = '';
+  isLoading = false;
 
   constructor(
     private authService: AuthService,
@@ -29,6 +31,7 @@ export class RegisterComponent {
     }
 
     this.errorMessage = '';
+    this.isLoading = true; // Ativa o loading no button
 
     this.authService.register({
       name: this.name,
@@ -36,9 +39,20 @@ export class RegisterComponent {
       password: this.password
     }).subscribe({
       next: () => {
-        this.router.navigate(['/login']);
+        this.isLoading = false; // Desativa o efeito de loading se sucesso
+
+        this.sucessMessage = 'Sucesso ao criar conta';
+
+        this.cdr.detectChanges();
+        
+        // aguarda 2 segundos para o usuário ler a mensagem
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
       },
       error: (err) => {
+        this.isLoading = false; // Desativa o efeito de loading no erro
+
         if (err.status === 409 || err.status === 500) {
           this.errorMessage = 'Email já cadastrado.';
         } else {
