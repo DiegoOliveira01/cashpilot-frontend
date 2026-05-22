@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TransactionService } from '../../core/services/transaction';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, finalize, switchMap, tap } from 'rxjs';
 import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
@@ -19,8 +19,15 @@ export class DashboardComponent {
 
   private refresh$ = new BehaviorSubject<void>(undefined);
 
+  isLoading = signal(true); // começa true — já está carregando ao abrir
+
   transactions = toSignal(
-    this.refresh$.pipe(switchMap(() => this.transactionService.getAll())),
+    this.refresh$.pipe(
+      tap(() => this.isLoading.set(true)),         // ativa ao iniciar
+      switchMap(() => this.transactionService.getAll()),
+      tap(() => this.isLoading.set(false)),         // desativa ao terminar
+      finalize(() => this.isLoading.set(false))     // garante desativar em caso de erro
+    ),
     { initialValue: [] }
   );
 

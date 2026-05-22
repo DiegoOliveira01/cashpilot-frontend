@@ -57,21 +57,31 @@
         <span class="text-gray-400 text-sm">{{ transactions().length }} registros</span>
       </div>
 
-      <!-- Vazia -->
-      @if (transactions().length === 0) {
-        <div class="flex flex-col items-center justify-center py-16 text-gray-500">
-          <p class="text-lg font-medium">Nenhuma transação ainda</p>
-          <p class="text-sm mt-1">Clique em "Nova Transação" para começar</p>
-        </div>
+    <!-- Loading -->
+      @if (isLoading()) {
+          <div class="flex flex-col items-center justify-center py-16 text-gray-500 gap-3">
+            <svg class="animate-spin h-8 w-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <p class="text-sm">Carregando transações...</p>
+          </div>
       }
 
-      <!-- Itens -->
+    <!-- Vazia -->
+    @if (!isLoading() && transactions().length === 0) {
+      <div class="flex flex-col items-center justify-center py-16 text-gray-500">
+        <p class="text-lg font-medium">Nenhuma transação ainda</p>
+        <p class="text-sm mt-1">Clique em "Nova Transação" para começar</p>
+      </div>
+    }
+
+    <!-- Itens -->
+    @if (!isLoading()) {
       @for (t of transactions(); track t.id) {
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition">
 
-          <!-- Info -->
           <div class="flex items-center gap-4">
-            <!-- Indicador de tipo -->
             <div class="w-2 h-2 rounded-full"
               [class.bg-green-400]="t.type === 'INCOME'"
               [class.bg-red-400]="t.type === 'EXPENSE'">
@@ -79,35 +89,33 @@
             <div>
               <p class="text-white text-sm font-medium">{{ t.description }}</p>
               <p class="text-gray-400 text-xs mt-0.5">{{ t.date }}</p>
-            </div>
+           </div>
           </div>
 
-          <!-- Valor e ações -->
           <div class="flex items-center gap-4">
             <p class="font-semibold text-sm"
-              [class.text-green-400]="t.type === 'INCOME'"
-              [class.text-red-400]="t.type === 'EXPENSE'">
-              {{ t.type === 'INCOME' ? '+' : '-' }} R$ {{ t.amount | number:'1.2-2' }}
+             [class.text-green-400]="t.type === 'INCOME'"
+             [class.text-red-400]="t.type === 'EXPENSE'">
+             {{ t.type === 'INCOME' ? '+' : '-' }} R$ {{ t.amount | number:'1.2-2' }}
             </p>
-
             <button
               [routerLink]="['/transactions/edit', t.id]"
-              class="text-gray-400 hover:text-indigo-400 text-xs font-medium transition cursor-pointer"
-            >
-              Editar
+             class="text-gray-400 hover:text-indigo-400 text-xs font-medium transition cursor-pointer"
+           >
+             Editar
             </button>
-
             <button
-              (click)="delete(t.id)"
+             (click)="delete(t.id)"
               class="text-gray-400 hover:text-red-400 text-xs font-medium transition cursor-pointer"
             >
               Excluir
-            </button>
-          </div>
-
-        </div>
-      }
+           </button>
+         </div>
+      </div>
+    }
+  }
 
     </div>
+
   </div>
 </div>
