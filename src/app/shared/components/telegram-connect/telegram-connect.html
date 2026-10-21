@@ -1,0 +1,41 @@
+<button
+  (click)="connect()"
+  [disabled]="isLoading()"
+  class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition cursor-pointer"
+>
+  {{ isLoading() ? 'Gerando link...' : 'Conectar Telegram' }}
+</button>
+
+@if (linkCode(); as link) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+    (click)="close()"
+  >
+    <div
+      class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="text-white font-semibold text-lg mb-2">Conectar ao Telegram</h2>
+      <p class="text-gray-400 text-sm mb-5">
+        Abra o bot e toque em <span class="text-white">Iniciar</span> para conectar sua conta.
+        O link vale por {{ link.expiresInMinutes }} minutos.
+      </p>
+
+      <a
+        [href]="link.deepLink"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition"
+      >
+        Abrir no Telegram
+      </a>
+
+      <button
+        (click)="close()"
+        class="w-full mt-3 text-gray-400 hover:text-white text-sm transition cursor-pointer"
+      >
+        Fechar
+      </button>
+    </div>
+  </div>
+}
