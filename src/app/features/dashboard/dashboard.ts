@@ -5,11 +5,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BehaviorSubject, finalize, switchMap, tap } from 'rxjs';
 import { NotificationService } from '../../core/services/notification.service';
+import { TelegramConnectComponent } from '../../shared/components/telegram-connect/telegram-connect';
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatePipe],
+  imports: [CommonModule, RouterModule, DatePipe, TelegramConnectComponent],
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent {
