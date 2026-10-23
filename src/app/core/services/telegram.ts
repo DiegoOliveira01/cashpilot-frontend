@@ -9,6 +9,11 @@ export interface TelegramLinkCode {
   expiresInMinutes: number;
 }
 
+export interface TelegramStatus {
+  connected: boolean;
+  botUsername: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -20,5 +25,9 @@ export class TelegramService {
 
   generateLinkCode(): Observable<TelegramLinkCode> {
     return this.http.post<TelegramLinkCode>(`${this.apiUrl}/link-code`, {});
+  }
+
+  getStatus(): Observable<TelegramStatus> {
+    return this.http.get<TelegramStatus>(`${this.apiUrl}/status`);
   }
 }
