@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Subscription, catchError, filter, finalize, of, switchMap, take, timer } from 'rxjs';
+import * as QRCode from 'qrcode';
 import { TelegramService, TelegramLinkCode, TelegramStatus } from '../../../core/services/telegram';
 import { NotificationService } from '../../../core/services/notification.service';
 
@@ -18,6 +19,7 @@ export class TelegramConnectComponent implements OnInit, OnDestroy {
 
   isLoading = signal(false);
   linkCode = signal<TelegramLinkCode | null>(null);
+  qrDataUrl = signal<string | null>(null);
   showConnected = signal(false);
 
   private polling?: Subscription;
@@ -50,6 +52,7 @@ export class TelegramConnectComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (res) => {
           this.linkCode.set(res);
+          this.generateQr(res.deepLink);
           if (!this.isConnected()) {
             this.waitForConnection();
           }
@@ -61,7 +64,16 @@ export class TelegramConnectComponent implements OnInit, OnDestroy {
   close() {
     this.stopPolling();
     this.linkCode.set(null);
+    this.qrDataUrl.set(null);
     this.showConnected.set(false);
+  }
+
+  // O QR é gerado no próprio navegador: o código de uso único não é enviado a nenhum serviço externo.
+  private generateQr(deepLink: string) {
+    QRCode.toDataURL(deepLink, { width: 352, margin: 1, errorCorrectionLevel: 'M' })
+      .then((url) => this.qrDataUrl.set(url))
+      // se falhar, o modal segue só com o botão "Abrir no Telegram"
+      .catch(() => this.qrDataUrl.set(null));
   }
 
   // Depois do link gerado, consulta o status a cada 3s (por ~10 min, a validade do código)
