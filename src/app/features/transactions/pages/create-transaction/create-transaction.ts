@@ -1,31 +1,59 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TransactionService } from '../../../../core/services/transaction';
+import { Category, CategoryService, TransactionType } from '../../../../core/services/category';
 
 @Component({
   selector: 'app-create-transaction',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './create-transaction.html'
   //styleUrl: './create-transaction.css',
 })
-export class CreateTransactionComponent {
-  
+export class CreateTransactionComponent implements OnInit {
+
   private service = inject(TransactionService);
+  private categoryService = inject(CategoryService);
   private router = inject(Router);
 
-  form = {
+  categories = signal<Category[]>([]);
+
+  form: {
+    description: string;
+    amount: number;
+    type: TransactionType;
+    date: string;
+    categoryId: number | null;
+  } = {
     description: '',
     amount: 0,
     type: 'INCOME',
-    date: ''
+    date: '',
+    categoryId: null
   };
+
+  // só as categorias do tipo selecionado (receita ou despesa)
+  get availableCategories(): Category[] {
+    return this.categories().filter(c => c.type === this.form.type);
+  }
+
+  ngOnInit() {
+    this.categoryService.getAll().subscribe({
+      next: (list) => this.categories.set(list),
+      error: (err) => console.error(err)
+    });
+  }
+
+  setType(type: TransactionType) {
+    this.form.type = type;
+    this.form.categoryId = null; // a categoria escolhida pode não existir no outro tipo
+  }
 
   submit(){
     this.service.create(this.form).subscribe({
       next: () => {
-        // volta para o dasboar após criar
+        // volta para o dashboard após criar
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

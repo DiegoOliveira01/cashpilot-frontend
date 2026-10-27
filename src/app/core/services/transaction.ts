@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable, retry } from 'rxjs';
+import { Observable } from 'rxjs';
+import { Category, CategorySummary } from './category';
 
 export interface Transaction {
   id: number;
@@ -9,6 +10,7 @@ export interface Transaction {
   amount: number;
   type: 'INCOME' | 'EXPENSE';
   date: string;
+  category: Category | null;
 }
 
 export interface TransactionSummary {
@@ -38,6 +40,11 @@ export class TransactionService {
     return this.http.get<TransactionSummary>(`${this.apiUrl}/summary`);
   }
 
+  // month no formato "2026-10"
+  getSummaryByCategory(month: string): Observable<CategorySummary[]> {
+    return this.http.get<CategorySummary[]>(`${this.apiUrl}/summary/by-category`, { params: { month } });
+  }
+
   create(data: any): Observable<Transaction> {
     return this.http.post<Transaction>(this.apiUrl, data);
   }
@@ -47,6 +54,6 @@ export class TransactionService {
   }
 
   delete(id: number) {
-  return this.http.delete(`${this.apiUrl}/${id}`);
-}
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
 }

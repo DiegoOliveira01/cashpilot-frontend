@@ -1,9 +1,10 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TransactionService } from '../../core/services/transaction';
+import { Category, CategoryService } from '../../core/services/category';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { BehaviorSubject, finalize, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { NotificationService } from '../../core/services/notification.service';
 import { TelegramConnectComponent } from '../../shared/components/telegram-connect/telegram-connect';
 
@@ -17,6 +18,7 @@ import { TelegramConnectComponent } from '../../shared/components/telegram-conne
 export class DashboardComponent {
 
   private transactionService = inject(TransactionService);
+  private categoryService = inject(CategoryService);
   private notify = inject(NotificationService);
 
   private refresh$ = new BehaviorSubject<void>(undefined);
@@ -25,17 +27,8 @@ export class DashboardComponent {
 
   selectedMonth = signal(this.getCurrentMonth()); // mês atual no formato "2026-04"
 
-  /*
-  transactions = toSignal(
-    this.refresh$.pipe(
-      tap(() => this.isLoading.set(true)),         // ativa ao iniciar
-      switchMap(() => this.transactionService.getAll()),
-      tap(() => this.isLoading.set(false)),         // desativa ao terminar
-      finalize(() => this.isLoading.set(false))     // garante desativar em caso de erro
-    ),
-    { initialValue: [] }
-  );
-  */
+  // filtro da lista: 'all' | 'none' (sem categoria) | id da categoria
+  categoryFilter = signal<string>('all');
 
   allTransactions = toSignal(
     this.refresh$.pipe(
@@ -47,16 +40,31 @@ export class DashboardComponent {
     { initialValue: [] }
   );
 
-  // filtra as transações pelo mês selecionado
-  transactions = computed(() =>
+  categories = toSignal(
+    this.categoryService.getAll().pipe(catchError(() => of([] as Category[]))),
+    { initialValue: [] as Category[] }
+  );
+
+  // transações do mês selecionado (base do resumo e do gráfico por categoria)
+  monthTransactions = computed(() =>
     this.allTransactions().filter(t =>
       t.date.startsWith(this.selectedMonth())
     )
   );
 
-  // recalcula o summary localmente com base nas transações filtradas
+  // lista exibida: mês + filtro de categoria
+  transactions = computed(() => {
+    const filter = this.categoryFilter();
+    const list = this.monthTransactions();
+
+    if (filter === 'all') return list;
+    if (filter === 'none') return list.filter(t => !t.category);
+    return list.filter(t => String(t.category?.id) === filter);
+  });
+
+  // o resumo olha o mês inteiro, independente do filtro de categoria
   summary = computed(() => {
-    const list = this.transactions();
+    const list = this.monthTransactions();
     const income = list
       .filter(t => t.type === 'INCOME')
       .reduce((acc, t) => acc + t.amount, 0);
@@ -70,10 +78,36 @@ export class DashboardComponent {
     };
   });
 
+  // despesas do mês agrupadas por categoria, com a participação de cada uma
+  expensesByCategory = computed(() => {
+    const expenses = this.monthTransactions().filter(t => t.type === 'EXPENSE');
+    const total = expenses.reduce((acc, t) => acc + t.amount, 0);
+
+    const groups = new Map<string, { name: string; icon: string; total: number }>();
+    for (const t of expenses) {
+      const key = t.category ? String(t.category.id) : 'none';
+      const group = groups.get(key) ?? {
+        name: t.category?.name ?? 'Sem categoria',
+        icon: t.category?.icon ?? '❔',
+        total: 0
+      };
+      group.total += t.amount;
+      groups.set(key, group);
+    }
+
+    return [...groups.values()]
+      .sort((a, b) => b.total - a.total)
+      .map(g => ({ ...g, percent: total > 0 ? (g.total / total) * 100 : 0 }));
+  });
+
   private getCurrentMonth(): string {
     const now = new Date();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     return `${now.getFullYear()}-${month}`;
+  }
+
+  onCategoryFilter(value: string) {
+    this.categoryFilter.set(value);
   }
 
   // navega entre os meses
@@ -98,24 +132,18 @@ export class DashboardComponent {
     return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   }
 
-  /*
-  summary = toSignal(
-    this.refresh$.pipe(switchMap(() => this.transactionService.getSummary()))
-  );
-  */
-
   delete(id: number) {
-  const confirmed = confirm('Deseja excluir esta transação?');
+    const confirmed = confirm('Deseja excluir esta transação?');
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  this.transactionService.delete(id).subscribe({
-    next: () => {
+    this.transactionService.delete(id).subscribe({
+      next: () => {
         this.notify.success('Transação excluída com sucesso!'); // 3. feedback
         this.refresh$.next();
       },
       error: () => this.notify.error('Erro ao excluir transação.')
     });
-}
+  }
 
 }

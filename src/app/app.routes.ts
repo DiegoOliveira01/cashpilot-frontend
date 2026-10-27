@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/pages/login/login';
 import { authGuard } from './core/guards/auth-guard';
 import { noAuthGuard } from './core/guards/no-auth-guard';
 import { RegisterComponent } from './features/auth/pages/register/register';
+import { CategoriesComponent } from './features/categories/categories';
 
 export const routes: Routes = [
   
@@ -22,6 +23,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/dashboard')
         .then(m => m.DashboardComponent)
+  },
+
+  { path: 'categories', 
+    canActivate: [authGuard], 
+    component: CategoriesComponent,
   },
 
   {

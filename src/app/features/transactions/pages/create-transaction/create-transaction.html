@@ -59,7 +59,7 @@
           <div class="grid grid-cols-2 gap-3">
             <button
               type="button"
-              (click)="form.type = 'INCOME'"
+              (click)="setType('INCOME')"
               class="py-2.5 rounded-lg text-sm font-semibold border transition cursor-pointer"
               [class.bg-green-500]="form.type === 'INCOME'"
               [class.text-white]="form.type === 'INCOME'"
@@ -72,7 +72,7 @@
             </button>
             <button
               type="button"
-              (click)="form.type = 'EXPENSE'"
+              (click)="setType('EXPENSE')"
               class="py-2.5 rounded-lg text-sm font-semibold border transition cursor-pointer"
               [class.bg-red-500]="form.type === 'EXPENSE'"
               [class.text-white]="form.type === 'EXPENSE'"
@@ -84,6 +84,26 @@
               - Despesa
             </button>
           </div>
+        </div>
+
+        <!-- Categoria -->
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-gray-300 mb-1">
+            Categoria
+          </label>
+          <select
+            [(ngModel)]="form.categoryId"
+            name="categoryId"
+            class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+          >
+            <option [ngValue]="null">Sem categoria</option>
+            @for (c of availableCategories; track c.id) {
+              <option [ngValue]="c.id">{{ c.icon }} {{ c.name }}</option>
+            }
+          </select>
+          <a routerLink="/categories" class="text-xs text-gray-500 hover:text-indigo-400 transition mt-1 inline-block">
+            Gerenciar categorias
+          </a>
         </div>
 
         <!-- Data -->
