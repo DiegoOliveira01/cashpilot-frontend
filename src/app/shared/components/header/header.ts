@@ -1,25 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/services/auth';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [RouterModule], // CommonModule removido (não precisamos mais do *ngIf)
   templateUrl: './header.html'
 })
 export class HeaderComponent {
+  public authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(
-    public authService: AuthService,
-    private router: Router
-  ) {}
-
-  logout(){
+  logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 }
-
-
