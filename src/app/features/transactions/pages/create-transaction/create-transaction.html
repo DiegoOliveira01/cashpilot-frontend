@@ -3,7 +3,6 @@
 
     <!-- Header -->
     <div class="flex items-center gap-4 mb-8">
-      <!-- Novo Botão Voltar -->
       <button routerLink="/dashboard" class="text-gray-400 hover:text-white p-2.5 rounded-lg hover:bg-gray-800 active:scale-90 transition flex items-center justify-center gap-1 group">
         <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -88,7 +87,7 @@
           </div>
         </div>
 
-        <!-- Categoria (Novo Grid Selecionável) -->
+        <!-- Categoria (Grid Selecionável) -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-300 mb-2">
             Categoria
@@ -145,6 +144,77 @@
               Gerenciar categorias →
             </a>
           </div>
+        </div>
+
+        <!-- Toggle de Recorrência -->
+        <div class="mb-6 p-4 bg-gray-800/50 border border-gray-700 rounded-xl">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-white">Conta recorrente</p>
+              <p class="text-xs text-gray-400">Repetir esta transação automaticamente</p>
+            </div>
+            <button
+              type="button"
+              (click)="toggleRecurrence()"
+              [class.bg-indigo-600]="form.isRecurring"
+              [class.bg-gray-700]="!form.isRecurring"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer"
+            >
+              <span
+                [class.translate-x-6]="form.isRecurring"
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+              ></span>
+            </button>
+          </div>
+
+          <!-- Configurações de Recorrência -->
+          @if (form.isRecurring) {
+            <div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-700 pt-4">
+              <div class="col-span-2 sm:col-span-1">
+                <label class="block text-xs text-gray-400 mb-1">Frequência</label>
+                <select
+                  [(ngModel)]="form.frequency"
+                  name="frequency"
+                  class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="WEEKLY">Semanal</option>
+                  <option value="MONTHLY">Mensal</option>
+                  <option value="TWICE_MONTHLY">Duas vezes no mês</option>
+                </select>
+              </div>
+
+              @if (form.frequency === 'MONTHLY') {
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="block text-xs text-gray-400 mb-1">Dia do mês</label>
+                  <input type="number" min="1" max="31" [(ngModel)]="form.firstDayOfMonth" name="firstDay" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+              }
+
+              @if (form.frequency === 'TWICE_MONTHLY') {
+                <div class="col-span-2 flex gap-2">
+                  <div class="flex-1">
+                    <label class="block text-xs text-gray-400 mb-1">1º Dia</label>
+                    <input type="number" min="1" max="31" [(ngModel)]="form.firstDayOfMonth" name="firstDay" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                  </div>
+                  <div class="flex-1">
+                    <label class="block text-xs text-gray-400 mb-1">2º Dia</label>
+                    <input type="number" min="1" max="31" [(ngModel)]="form.secondDayOfMonth" name="secondDay" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                  </div>
+                </div>
+              }
+
+              <div class="col-span-2 flex gap-3 mt-2">
+                <div class="flex-1">
+                  <label class="block text-xs text-gray-400 mb-1">Data final (Opcional)</label>
+                  <input type="date" [(ngModel)]="form.endDate" name="endDate" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+                <div class="flex-1">
+                  <label class="block text-xs text-gray-400 mb-1">Máx. repetições (Opcional)</label>
+                  <input type="number" min="1" placeholder="Ex: 12" [(ngModel)]="form.maxOccurrences" name="maxOccurrences" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+              </div>
+            </div>
+          }
         </div>
 
         <!-- Data -->

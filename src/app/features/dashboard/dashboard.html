@@ -134,6 +134,59 @@
 
     </div>
 
+
+    <!-- ================= Próximas Contas ================= -->
+    @if (upcomingRecurrences().length > 0) {
+      <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 mb-8">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-white font-semibold">Próximas contas</h2>
+          <a routerLink="/recurring" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition">
+            Ver todas →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          @for (rec of upcomingRecurrences(); track rec.id) {
+            <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 flex flex-col gap-3 hover:bg-gray-800 transition">
+              
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-black/20 flex items-center justify-center shrink-0">
+                    @if (rec.categoryIcon?.startsWith('lucide')) {
+                      <app-icon [name]="rec.categoryIcon!" class="w-4 h-4" 
+                               [class.text-red-400]="rec.type === 'EXPENSE'" 
+                               [class.text-green-400]="rec.type === 'INCOME'" />
+                    } @else if (rec.categoryIcon) {
+                      <span class="text-sm">{{ rec.categoryIcon }}</span>
+                    } @else {
+                      <app-icon name="lucideRepeat" class="w-4 h-4 text-gray-400" />
+                    }
+                  </div>
+                  <span class="text-sm font-medium text-white truncate" [title]="rec.description">
+                    {{ rec.description }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-end justify-between">
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Próxima</p>
+                  <p class="text-xs font-medium text-gray-300">{{ rec.nextOccurrenceDate | date:'dd/MM/yyyy' }}</p>
+                </div>
+                <p class="text-sm font-bold"
+                   [class.text-green-400]="rec.type === 'INCOME'"
+                   [class.text-red-400]="rec.type === 'EXPENSE'">
+                  {{ rec.type === 'INCOME' ? '+' : '-' }} R$ {{ rec.amount | number:'1.2-2' }}
+                </p>
+              </div>
+
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+
     <!-- ================= Despesas por categoria ================= -->
     @if (expensesByCategory().length > 0) {
       <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 mb-8">

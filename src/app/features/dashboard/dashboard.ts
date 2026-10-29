@@ -8,6 +8,8 @@ import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs'
 import { NotificationService } from '../../core/services/notification.service';
 import { TelegramConnectComponent } from '../../shared/components/telegram-connect/telegram-connect';
 import { IconComponent } from '../../shared/components/icon/icon.component'; // Import para uso de icones
+import { RecurringTransactionService } from '../../core/services/recurring-transaction.service';
+import { RecurringTransactionResponse } from '../../core/services/recurring-transaction';
 
 interface CategoryExpense {
   id: string;
@@ -44,6 +46,7 @@ interface BalanceDelta {
 export class DashboardComponent {
   private transactionService = inject(TransactionService);
   private categoryService = inject(CategoryService);
+  private recurringService = inject(RecurringTransactionService);
   private notify = inject(NotificationService);
 
   // Paleta estável para colorir cada categoria no gráfico/barras
@@ -82,6 +85,20 @@ export class DashboardComponent {
     this.categoryService.getAll().pipe(catchError(() => of([] as Category[]))),
     { initialValue: [] as Category[] }
   );
+
+  // Buscar recorrências
+  recurringTransactions = toSignal(
+    this.recurringService.getAll().pipe(catchError(() => of([] as RecurringTransactionResponse[]))),
+    { initialValue: [] as RecurringTransactionResponse[] }
+  );
+
+  // Filtrar apenas as ativas e ordenar pela data de próxima ocorrência
+  upcomingRecurrences = computed(() => {
+    return this.recurringTransactions()
+      .filter(rec => rec.isActive)
+      .sort((a, b) => new Date(a.nextOccurrenceDate).getTime() - new Date(b.nextOccurrenceDate).getTime())
+      .slice(0, 4); // Mostrar apenas as 4 mais próximas para não poluir o dashboard
+  });
 
   // ---- Mês atual / navegação ---------------------------------------------
   isCurrentMonth = computed(() => this.selectedMonth() === this.getCurrentMonth());

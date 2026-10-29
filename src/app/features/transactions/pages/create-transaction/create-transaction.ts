@@ -3,19 +3,21 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TransactionService } from '../../../../core/services/transaction';
 import { Category, CategoryService, TransactionType } from '../../../../core/services/category';
-import { IconComponent } from '../../../../shared/components/icon/icon.component'; // Import para uso de icones
+import { RecurringTransactionService } from '../../../../core/services/recurring-transaction.service';
+import { RecurrenceFrequency } from '../../../../core/services/recurring-transaction';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-create-transaction',
   standalone: true,
   imports: [FormsModule, RouterLink, IconComponent],
   templateUrl: './create-transaction.html'
-  //styleUrl: './create-transaction.css',
 })
 export class CreateTransactionComponent implements OnInit {
 
   private service = inject(TransactionService);
   private categoryService = inject(CategoryService);
+  private recurringService = inject(RecurringTransactionService);
   private router = inject(Router);
 
   categories = signal<Category[]>([]);
@@ -26,15 +28,28 @@ export class CreateTransactionComponent implements OnInit {
     type: TransactionType;
     date: string;
     categoryId: number | null;
+    // Campos de Recorrência
+    isRecurring: boolean;
+    frequency: RecurrenceFrequency;
+    firstDayOfMonth: number | null;
+    secondDayOfMonth: number | null;
+    endDate: string | null;
+    maxOccurrences: number | null;
   } = {
     description: '',
     amount: 0,
-    type: 'INCOME',
-    date: '',
-    categoryId: null
+    type: 'EXPENSE',
+    date: new Date().toISOString().split('T')[0], // Preenche com a data de hoje por padrão
+    categoryId: null,
+    isRecurring: false,
+    frequency: 'MONTHLY',
+    firstDayOfMonth: null,
+    secondDayOfMonth: null,
+    endDate: null,
+    maxOccurrences: null
   };
 
-  // só as categorias do tipo selecionado (receita ou despesa)
+  // Só as categorias do tipo selecionado (receita ou despesa)
   get availableCategories(): Category[] {
     return this.categories().filter(c => c.type === this.form.type);
   }
@@ -51,15 +66,56 @@ export class CreateTransactionComponent implements OnInit {
     this.form.categoryId = null; // a categoria escolhida pode não existir no outro tipo
   }
 
-  submit(){
-    this.service.create(this.form).subscribe({
-      next: () => {
-        // volta para o dashboard após criar
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
+  toggleRecurrence() {
+    this.form.isRecurring = !this.form.isRecurring;
+    if (this.form.isRecurring && this.form.date) {
+      // Pega o dia da data escolhida e já preenche no campo de recorrência mensal
+      this.form.firstDayOfMonth = new Date(this.form.date + 'T00:00:00').getDate();
+    }
+  }
+
+  submit() {
+    if (this.form.isRecurring) {
+      // Monta o payload para recorrência
+      const payloadRecurring = {
+        description: this.form.description,
+        amount: this.form.amount,
+        type: this.form.type,
+        categoryId: this.form.categoryId,
+        frequency: this.form.frequency,
+        firstDayOfMonth: this.form.firstDayOfMonth,
+        secondDayOfMonth: this.form.frequency === 'TWICE_MONTHLY' ? this.form.secondDayOfMonth : null,
+        startDate: this.form.date,
+        endDate: this.form.endDate,
+        maxOccurrences: this.form.maxOccurrences
+      };
+
+      this.recurringService.create(payloadRecurring).subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Erro ao criar recorrência', err);
+        }
+      });
+    } else {
+      // Monta o payload de transação normal (remove os campos extras que o backend não espera)
+      const payloadNormal = {
+        description: this.form.description,
+        amount: this.form.amount,
+        type: this.form.type,
+        date: this.form.date,
+        categoryId: this.form.categoryId
+      };
+
+      this.service.create(payloadNormal).subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+    }
   }
 }
