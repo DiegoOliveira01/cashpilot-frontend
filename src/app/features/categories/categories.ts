@@ -4,11 +4,13 @@ import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Category, CategoryService, TransactionType } from '../../core/services/category';
 import { NotificationService } from '../../core/services/notification.service';
+import { IconComponent } from '../../shared/components/icon/icon.component'; // Import para uso de icones
+import { AVAILABLE_ICONS } from '../../shared/constants/icons'; // Import de array de icones
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IconComponent], 
   templateUrl: './categories.html'
 })
 export class CategoriesComponent implements OnInit {
@@ -22,6 +24,12 @@ export class CategoriesComponent implements OnInit {
 
   editingId = signal<number | null>(null);
   isSaving = signal(false);
+
+  // Controle do seletor de ícones
+  isIconPickerOpen = signal(false);
+
+  // Apenas referenciando a constante externa
+  availableIcons = AVAILABLE_ICONS;
 
   form: { name: string; type: TransactionType; icon: string } = {
     name: '',
@@ -72,7 +80,12 @@ export class CategoriesComponent implements OnInit {
 
   edit(category: Category) {
     this.editingId.set(category.id);
-    this.form = { name: category.name, type: category.type, icon: category.icon ?? '' };
+    this.form = { 
+      name: category.name, 
+      type: category.type, 
+      icon: category.icon ?? '' 
+    };
+    this.isIconPickerOpen.set(false); // Fecha o seletor ao editar
   }
 
   cancelEdit() {
@@ -96,11 +109,21 @@ export class CategoriesComponent implements OnInit {
   }
 
   setType(type: TransactionType) {
-    if (this.editingId() === null) this.form.type = type; // o tipo não pode mudar na edição
+    if (this.editingId() === null) this.form.type = type;
+  }
+
+  toggleIconPicker() {
+    this.isIconPickerOpen.update(v => !v);
+  }
+
+  selectIcon(iconName: string) {
+    this.form.icon = iconName;
+    this.isIconPickerOpen.set(false); // Fecha após escolher
   }
 
   private resetForm() {
     this.editingId.set(null);
     this.form = { name: '', type: 'EXPENSE', icon: '' };
+    this.isIconPickerOpen.set(false);
   }
 }

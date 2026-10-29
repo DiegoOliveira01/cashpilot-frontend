@@ -3,11 +3,12 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TransactionService } from '../../../../core/services/transaction';
 import { Category, CategoryService, TransactionType } from '../../../../core/services/category';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-edit-transaction',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './edit-transaction.html',
 })
 export class EditTransactionComponent implements OnInit{

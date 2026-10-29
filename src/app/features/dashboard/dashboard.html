@@ -26,7 +26,6 @@
 
     <!-- ================= Seletor de mês ================= -->
     <div class="flex items-center justify-center gap-3 mb-8">
-      <!-- Botão Anterior -->
       <button (click)="previousMonth()" aria-label="Mês anterior"
         class="text-gray-400 hover:text-white p-2.5 rounded-lg hover:bg-gray-800 active:scale-90 transition flex items-center justify-center">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -46,7 +45,6 @@
         }
       </div>
     
-      <!-- Botão Próximo -->
       <button (click)="nextMonth()" aria-label="Próximo mês"
         class="text-gray-400 hover:text-white p-2.5 rounded-lg hover:bg-gray-800 active:scale-90 transition flex items-center justify-center">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -171,7 +169,16 @@
                 <div class="flex items-center justify-between text-sm mb-1.5 gap-3">
                   <div class="flex items-center gap-2 min-w-0">
                     <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background-color]="c.color"></span>
-                    <span class="text-gray-300 truncate">{{ c.icon }} {{ c.name }}</span>
+                    <div class="flex items-center gap-1.5 text-gray-300 truncate">
+                      @if (c.icon?.startsWith('lucide')) {
+                        <app-icon [name]="c.icon!" class="w-4 h-4 shrink-0" />
+                      } @else if (c.icon) {
+                        <span>{{ c.icon }}</span>
+                      } @else {
+                        <app-icon name="lucideTag" class="w-4 h-4 shrink-0" />
+                      }
+                      <span class="truncate">{{ c.name }}</span>
+                    </div>
                   </div>
                   <span class="text-gray-400 text-xs whitespace-nowrap">
                     R$ {{ c.total | number:'1.2-2' }} · {{ c.percent | number:'1.0-0' }}%
@@ -214,22 +221,30 @@
           </button>
 
           <button
-            (click)="onCategoryFilter('none')"
-            [class]="categoryFilter() === 'none'
+            (click)="onCategoryFilter('none')" [class]="categoryFilter() === 'none'
               ? 'bg-indigo-600 text-white border-indigo-500'
               : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'"
-            class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition"
+            class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition flex items-center gap-1.5"
           >
-            ❔ Sem categoria
+            <app-icon name="lucideTag" class="w-3.5 h-3.5" />
+            Sem categoria
           </button>
 
           @for (c of categories(); track c.id) {
-            <<button (click)="onCategoryFilter(asId(c.id))" [class]="categoryFilter() === asId(c.id)
+            <button (click)="onCategoryFilter(asId(c.id))" [class]="categoryFilter() === asId(c.id)
                 ? 'bg-indigo-600 text-white border-indigo-500'
                 : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'"
-              class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition">
-              {{ c.icon }} {{ c.name }}
-              </button>
+              class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition flex items-center gap-1.5">
+              
+              @if (c.icon?.startsWith('lucide')) {
+                <app-icon [name]="c.icon!" class="w-3.5 h-3.5" />
+              } @else if (c.icon) {
+                {{ c.icon }}
+              } @else {
+                <app-icon name="lucideTag" class="w-3.5 h-3.5" />
+              }
+              {{ c.name }}
+            </button>
           }
         </div>
       </div>
@@ -305,11 +320,22 @@
               <div class="flex items-center gap-4 min-w-0 flex-1">
                 <!-- Avatar da categoria -->
                 <div
-                  class="w-10 h-10 rounded-full flex items-center justify-center text-base shrink-0"
+                  class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                   [class.bg-green-500/10]="t.type === 'INCOME'"
                   [class.bg-red-500/10]="t.type === 'EXPENSE'"
                 >
-                  {{ t.category?.icon ?? (t.type === 'INCOME' ? '💰' : '💸') }}
+                  @if (t.category?.icon?.startsWith('lucide')) {
+                    <app-icon [name]="t.category!.icon!" class="w-5 h-5" 
+                             [class.text-green-400]="t.type === 'INCOME'" 
+                             [class.text-red-400]="t.type === 'EXPENSE'" />
+                  } @else if (t.category?.icon) {
+                    <span class="text-base">{{ t.category!.icon }}</span>
+                  } @else {
+                    <app-icon [name]="t.type === 'INCOME' ? 'lucideArrowDownLeft' : 'lucideArrowUpRight'" 
+                             class="w-5 h-5"
+                             [class.text-green-400]="t.type === 'INCOME'" 
+                             [class.text-red-400]="t.type === 'EXPENSE'" />
+                  }
                 </div>
 
                 <div class="min-w-0 flex-1">

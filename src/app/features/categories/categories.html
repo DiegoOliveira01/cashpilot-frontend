@@ -20,17 +20,47 @@
 
       <form (ngSubmit)="save()" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
 
-        <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-gray-400 mb-1">Emoji</label>
-          <input
-            [(ngModel)]="form.icon"
-            name="icon"
-            maxlength="8"
-            placeholder="🐶"
-            class="w-full bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-          />
+        <!-- Seletor de Ícones -->
+        <div class="sm:col-span-2 relative">
+          <label class="block text-xs font-medium text-gray-400 mb-1">Ícone</label>
+          
+          <button
+            type="button"
+            (click)="toggleIconPicker()"
+            class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2.5 text-sm flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-indigo-500 transition hover:bg-gray-700"
+          >
+            <div class="flex items-center gap-2">
+              @if (form.icon) {
+                <app-icon [name]="form.icon" class="w-5 h-5 text-indigo-400" />
+              } @else {
+                <span class="text-gray-500 text-xs">Selecione</span>
+              }
+            </div>
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Painel do seletor -->
+          @if (isIconPickerOpen()) {
+            <!-- Adicionado as classes de esconder scrollbar -->
+            <div class="absolute z-50 mt-1 w-72 p-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl grid grid-cols-4 gap-1 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              @for (icon of availableIcons; track icon.name) {
+                <button
+                  type="button"
+                  (click)="selectIcon(icon.name)"
+                  class="p-2 rounded-md hover:bg-gray-700 flex items-center justify-center transition-colors group"
+                  [class.bg-indigo-500/20]="form.icon === icon.name"
+                  [title]="icon.label"
+                >
+                  <app-icon [name]="icon.name" class="w-8 h-8 text-gray-400 group-hover:text-white transition-colors" />
+                </button>
+              }
+            </div>
+          }
         </div>
 
+        <!-- Nome -->
         <div class="sm:col-span-5">
           <label class="block text-xs font-medium text-gray-400 mb-1">Nome</label>
           <input
@@ -43,6 +73,7 @@
           />
         </div>
 
+        <!-- Tipo -->
         <div class="sm:col-span-3">
           <label class="block text-xs font-medium text-gray-400 mb-1">Tipo</label>
           <div class="grid grid-cols-2 gap-2">
@@ -77,6 +108,7 @@
           </div>
         </div>
 
+        <!-- Botões -->
         <div class="sm:col-span-2 flex gap-2">
           <button
             type="submit"
@@ -109,9 +141,17 @@
           <span class="text-gray-400 text-sm">{{ expenseCategories().length }}</span>
         </div>
         @for (c of expenseCategories(); track c.id) {
-          <div class="flex items-center justify-between px-6 py-3 border-b border-gray-800 last:border-0">
+          <div class="flex items-center justify-between px-6 py-3 border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition">
             <div class="flex items-center gap-3">
-              <span class="text-lg">{{ c.icon ?? '🏷️' }}</span>
+              
+              <!-- NOVO: Ícone dentro de um círculo vermelho translúcido -->
+              <div class="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                <app-icon 
+                  [name]="c.icon?.startsWith('lucide') ? c.icon! : 'lucideTag'" 
+                  class="w-5 h-5 text-red-400" 
+                />
+              </div>
+
               <span class="text-white text-sm">{{ c.name }}</span>
               @if (c.builtIn) {
                 <span class="text-[10px] uppercase tracking-wider text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">padrão</span>
@@ -134,9 +174,17 @@
           <span class="text-gray-400 text-sm">{{ incomeCategories().length }}</span>
         </div>
         @for (c of incomeCategories(); track c.id) {
-          <div class="flex items-center justify-between px-6 py-3 border-b border-gray-800 last:border-0">
+          <div class="flex items-center justify-between px-6 py-3 border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition">
             <div class="flex items-center gap-3">
-              <span class="text-lg">{{ c.icon ?? '🏷️' }}</span>
+              
+              <!-- NOVO: Ícone dentro de um círculo verde translúcido -->
+              <div class="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                <app-icon 
+                  [name]="c.icon?.startsWith('lucide') ? c.icon! : 'lucideTag'" 
+                  class="w-5 h-5 text-green-400" 
+                />
+              </div>
+
               <span class="text-white text-sm">{{ c.name }}</span>
               @if (c.builtIn) {
                 <span class="text-[10px] uppercase tracking-wider text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">padrão</span>

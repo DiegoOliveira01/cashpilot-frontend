@@ -86,24 +86,63 @@
           </div>
         </div>
 
-        <!-- Categoria -->
-        <div class="mb-5">
-          <label class="block text-sm font-medium text-gray-300 mb-1">
+        <!-- Categoria (Novo Grid Selecionável) -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-300 mb-2">
             Categoria
           </label>
-          <select
-            [(ngModel)]="form.categoryId"
-            name="categoryId"
-            class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-          >
-            <option [ngValue]="null">Sem categoria</option>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <!-- Opção: Sem categoria -->
+            <button
+              type="button"
+              (click)="form.categoryId = null"
+              class="flex items-center gap-2 p-2.5 rounded-lg border transition text-left"
+              [class.bg-indigo-600]="form.categoryId === null"
+              [class.text-white]="form.categoryId === null"
+              [class.border-indigo-500]="form.categoryId === null"
+              [class.bg-gray-800]="form.categoryId !== null"
+              [class.text-gray-400]="form.categoryId !== null"
+              [class.border-gray-700]="form.categoryId !== null"
+            >
+              <div class="w-6 h-6 rounded-md bg-black/20 flex items-center justify-center shrink-0">
+                <app-icon name="lucideTag" class="w-3.5 h-3.5" />
+              </div>
+              <span class="text-xs font-medium truncate">Sem categoria</span>
+            </button>
+
+            <!-- Opções de Categorias -->
             @for (c of availableCategories; track c.id) {
-              <option [ngValue]="c.id">{{ c.icon }} {{ c.name }}</option>
+              <button
+                type="button"
+                (click)="form.categoryId = c.id"
+                class="flex items-center gap-2 p-2.5 rounded-lg border transition text-left"
+                [class.bg-indigo-600]="form.categoryId === c.id"
+                [class.text-white]="form.categoryId === c.id"
+                [class.border-indigo-500]="form.categoryId === c.id"
+                [class.bg-gray-800]="form.categoryId !== c.id"
+                [class.text-gray-400]="form.categoryId !== c.id"
+                [class.border-gray-700]="form.categoryId !== c.id"
+              >
+                <div class="w-6 h-6 rounded-md bg-black/20 flex items-center justify-center shrink-0">
+                  @if (c.icon?.startsWith('lucide')) {
+                    <app-icon [name]="c.icon!" class="w-3.5 h-3.5" />
+                  } @else if (c.icon) {
+                    <span class="text-sm">{{ c.icon }}</span>
+                  } @else {
+                    <app-icon name="lucideTag" class="w-3.5 h-3.5" />
+                  }
+                </div>
+                <span class="text-xs font-medium truncate">{{ c.name }}</span>
+              </button>
             }
-          </select>
-          <a routerLink="/categories" class="text-xs text-gray-500 hover:text-indigo-400 transition mt-1 inline-block">
-            Gerenciar categorias
-          </a>
+          </div>
+          
+          <div class="mt-2 text-right">
+            <a routerLink="/categories" class="text-xs text-gray-500 hover:text-indigo-400 transition inline-block">
+              Gerenciar categorias →
+            </a>
+          </div>
         </div>
 
         <!-- Data -->

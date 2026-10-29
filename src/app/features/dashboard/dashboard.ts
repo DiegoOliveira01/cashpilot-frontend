@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { NotificationService } from '../../core/services/notification.service';
 import { TelegramConnectComponent } from '../../shared/components/telegram-connect/telegram-connect';
+import { IconComponent } from '../../shared/components/icon/icon.component'; // Import para uso de icones
 
 interface CategoryExpense {
   id: string;
@@ -37,7 +38,7 @@ interface BalanceDelta {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatePipe, TelegramConnectComponent],
+  imports: [CommonModule, RouterModule, DatePipe, TelegramConnectComponent, IconComponent],
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent {

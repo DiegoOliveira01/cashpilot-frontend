@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TransactionService } from '../../../../core/services/transaction';
 import { Category, CategoryService, TransactionType } from '../../../../core/services/category';
+import { IconComponent } from '../../../../shared/components/icon/icon.component'; // Import para uso de icones
 
 @Component({
   selector: 'app-create-transaction',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IconComponent],
   templateUrl: './create-transaction.html'
   //styleUrl: './create-transaction.css',
 })
