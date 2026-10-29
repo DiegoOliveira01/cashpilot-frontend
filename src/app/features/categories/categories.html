@@ -3,9 +3,14 @@
 
     <!-- Header -->
     <div class="flex items-center gap-4 mb-8">
-      <button routerLink="/dashboard" class="text-gray-400 hover:text-white transition cursor-pointer">
-        ← Voltar
+      <!-- Novo Botão Voltar -->
+      <button routerLink="/dashboard" class="text-gray-400 hover:text-white p-2.5 rounded-lg hover:bg-gray-800 active:scale-90 transition flex items-center justify-center gap-1 group">
+        <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span class="text-sm font-medium pr-1">Voltar</span>
       </button>
+      
       <div>
         <h1 class="text-2xl font-bold text-white">Categorias</h1>
         <p class="text-gray-400 text-sm mt-1">Organize suas receitas e despesas</p>
@@ -43,7 +48,6 @@
 
           <!-- Painel do seletor -->
           @if (isIconPickerOpen()) {
-            <!-- Adicionado as classes de esconder scrollbar -->
             <div class="absolute z-50 mt-1 w-72 p-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl grid grid-cols-4 gap-1 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               @for (icon of availableIcons; track icon.name) {
                 <button
@@ -144,7 +148,6 @@
           <div class="flex items-center justify-between px-6 py-3 border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition">
             <div class="flex items-center gap-3">
               
-              <!-- NOVO: Ícone dentro de um círculo vermelho translúcido -->
               <div class="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
                 <app-icon 
                   [name]="c.icon?.startsWith('lucide') ? c.icon! : 'lucideTag'" 
@@ -177,7 +180,6 @@
           <div class="flex items-center justify-between px-6 py-3 border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition">
             <div class="flex items-center gap-3">
               
-              <!-- NOVO: Ícone dentro de um círculo verde translúcido -->
               <div class="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
                 <app-icon 
                   [name]="c.icon?.startsWith('lucide') ? c.icon! : 'lucideTag'" 
