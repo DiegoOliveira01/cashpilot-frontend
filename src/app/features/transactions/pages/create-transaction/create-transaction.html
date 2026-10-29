@@ -22,9 +22,7 @@
 
         <!-- Descrição -->
         <div class="mb-5">
-          <label class="block text-sm font-medium text-gray-300 mb-1">
-            Descrição
-          </label>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
           <input
             [(ngModel)]="form.description"
             name="description"
@@ -36,9 +34,7 @@
 
         <!-- Valor -->
         <div class="mb-5">
-          <label class="block text-sm font-medium text-gray-300 mb-1">
-            Valor
-          </label>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Valor</label>
           <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">R$</span>
             <input
@@ -54,9 +50,7 @@
 
         <!-- Tipo -->
         <div class="mb-5">
-          <label class="block text-sm font-medium text-gray-300 mb-1">
-            Tipo
-          </label>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
           <div class="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -89,9 +83,7 @@
 
         <!-- Categoria (Grid Selecionável) -->
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-300 mb-2">
-            Categoria
-          </label>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Categoria</label>
           
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <!-- Opção: Sem categoria -->
@@ -170,6 +162,20 @@
           <!-- Configurações de Recorrência -->
           @if (form.isRecurring) {
             <div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-700 pt-4">
+              
+              <!-- Data de Início (Movida para cá para evitar conflito) -->
+              <div class="col-span-2">
+                <label class="block text-xs text-gray-400 mb-1">Data de Início (Primeira ocorrência)</label>
+                <input 
+                  type="date" 
+                  [(ngModel)]="form.date" 
+                  (change)="updateFirstDay()"
+                  name="startDateRec" 
+                  required 
+                  class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                />
+              </div>
+
               <div class="col-span-2 sm:col-span-1">
                 <label class="block text-xs text-gray-400 mb-1">Frequência</label>
                 <select
@@ -217,19 +223,21 @@
           }
         </div>
 
-        <!-- Data -->
-        <div class="mb-8">
-          <label class="block text-sm font-medium text-gray-300 mb-1">
-            Data
-          </label>
-          <input
-            type="date"
-            [(ngModel)]="form.date"
-            name="date"
-            required
-            class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-          />
-        </div>
+        <!-- Data (SÓ APARECE SE NÃO FOR RECORRENTE) -->
+        @if (!form.isRecurring) {
+          <div class="mb-8">
+            <label class="block text-sm font-medium text-gray-300 mb-1">Data</label>
+            <input
+              type="date"
+              [(ngModel)]="form.date"
+              name="dateNormal"
+              required
+              class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            />
+          </div>
+        } @else {
+          <div class="mb-8"></div> <!-- Mantém o espaçamento para o botão não colar -->
+        }
 
         <!-- Botão -->
         <button

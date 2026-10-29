@@ -66,10 +66,22 @@ export class CreateTransactionComponent implements OnInit {
     this.form.categoryId = null; // a categoria escolhida pode não existir no outro tipo
   }
 
-  toggleRecurrence() {
+    toggleRecurrence() {
     this.form.isRecurring = !this.form.isRecurring;
+
+    if (this.form.isRecurring && !this.form.date) {
+      // Se ligou a recorrência e não tem data, sugere hoje
+      this.form.date = new Date().toISOString().split('T')[0];
+    }
+
     if (this.form.isRecurring && this.form.date) {
-      // Pega o dia da data escolhida e já preenche no campo de recorrência mensal
+      // Preenche o dia do mês baseado na data escolhida
+      this.updateFirstDay();
+    }
+  }
+
+  updateFirstDay() {
+    if (this.form.isRecurring && this.form.date) {
       this.form.firstDayOfMonth = new Date(this.form.date + 'T00:00:00').getDate();
     }
   }
