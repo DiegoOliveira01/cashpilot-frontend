@@ -11,6 +11,7 @@ export interface Transaction {
   type: 'INCOME' | 'EXPENSE';
   date: string;
   category: Category | null;
+  isPaid: boolean;
 }
 
 export interface TransactionSummary {
@@ -43,6 +44,10 @@ export class TransactionService {
   // month no formato "2026-10"
   getSummaryByCategory(month: string): Observable<CategorySummary[]> {
     return this.http.get<CategorySummary[]>(`${this.apiUrl}/summary/by-category`, { params: { month } });
+  }
+
+  pay(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/pay`, {});
   }
 
   create(data: any): Observable<Transaction> {

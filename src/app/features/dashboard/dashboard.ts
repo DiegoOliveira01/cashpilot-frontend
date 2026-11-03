@@ -1,13 +1,13 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { TransactionService } from '../../core/services/transaction';
+import { TransactionService, Transaction } from '../../core/services/transaction';
 import { Category, CategoryService } from '../../core/services/category';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { NotificationService } from '../../core/services/notification.service';
 import { TelegramConnectComponent } from '../../shared/components/telegram-connect/telegram-connect';
-import { IconComponent } from '../../shared/components/icon/icon.component'; // Import para uso de icones
+import { IconComponent } from '../../shared/components/icon/icon.component';
 import { RecurringTransactionService } from '../../core/services/recurring-transaction.service';
 import { RecurringTransactionResponse } from '../../core/services/recurring-transaction';
 
@@ -28,7 +28,7 @@ interface DonutSegment extends CategoryExpense {
 interface TransactionGroup {
   date: string;
   label: string;
-  items: any[];
+  items: Transaction[];
   total: number;
 }
 
@@ -49,7 +49,6 @@ export class DashboardComponent {
   private recurringService = inject(RecurringTransactionService);
   private notify = inject(NotificationService);
 
-  // Paleta estável para colorir cada categoria no gráfico/barras
   private readonly PALETTE = [
     '#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399',
     '#22d3ee', '#38bdf8', '#818cf8', '#e879f9', '#f472b6',
@@ -60,8 +59,6 @@ export class DashboardComponent {
   isLoading = signal(true);
   selectedMonth = signal(this.getCurrentMonth());
   categoryFilter = signal<string>('all');
-
-  // Modal de confirmação de exclusão
   deleteTarget = signal<{ id: number; description: string } | null>(null);
 
   allTransactions = toSignal(
@@ -86,27 +83,32 @@ export class DashboardComponent {
     { initialValue: [] as Category[] }
   );
 
-  // Buscar recorrências
   recurringTransactions = toSignal(
     this.recurringService.getAll().pipe(catchError(() => of([] as RecurringTransactionResponse[]))),
     { initialValue: [] as RecurringTransactionResponse[] }
   );
 
-  // Filtrar apenas as ativas e ordenar pela data de próxima ocorrência
   upcomingRecurrences = computed(() => {
     return this.recurringTransactions()
       .filter(rec => rec.isActive)
       .sort((a, b) => new Date(a.nextOccurrenceDate).getTime() - new Date(b.nextOccurrenceDate).getTime())
-      .slice(0, 4); // Mostrar apenas as 4 mais próximas para não poluir o dashboard
+      .slice(0, 4);
   });
 
-  // ---- Mês atual / navegação ---------------------------------------------
   isCurrentMonth = computed(() => this.selectedMonth() === this.getCurrentMonth());
 
   monthTransactions = computed(() =>
     this.allTransactions().filter((t) => t.date.startsWith(this.selectedMonth()))
   );
 
+  // Contas pendentes (não pagas)
+  pendingTransactions = computed(() => {
+    return this.monthTransactions()
+      .filter(t => !t.isPaid)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  });
+
+  // Lista de transações gerais (inclui pagas e pendentes, filtradas por categoria)
   transactions = computed(() => {
     const filter = this.categoryFilter();
     const list = this.monthTransactions();
@@ -115,17 +117,18 @@ export class DashboardComponent {
     return list.filter((t) => String(t.category?.id) === filter);
   });
 
+  // O resumo só considera contas com isPaid === true
   summary = computed(() => {
-    const list = this.monthTransactions();
+    const list = this.monthTransactions().filter(t => t.isPaid !== false); // Considera true ou null como pagas
     const income = list.filter((t) => t.type === 'INCOME').reduce((a, t) => a + t.amount, 0);
     const expense = list.filter((t) => t.type === 'EXPENSE').reduce((a, t) => a + t.amount, 0);
     return { income, expense, balance: income - expense };
   });
 
-  // Comparação com o mês anterior (saldo)
   private previousMonthBalance = computed(() => {
     const prev = this.getPreviousMonthKey();
-    const list = this.allTransactions().filter((t) => t.date.startsWith(prev));
+    // Mês anterior também só conta pagos
+    const list = this.allTransactions().filter((t) => t.date.startsWith(prev) && t.isPaid !== false);
     const income = list.filter((t) => t.type === 'INCOME').reduce((a, t) => a + t.amount, 0);
     const expense = list.filter((t) => t.type === 'EXPENSE').reduce((a, t) => a + t.amount, 0);
     return income - expense;
@@ -134,15 +137,15 @@ export class DashboardComponent {
   balanceDelta = computed<BalanceDelta | null>(() => {
     const prev = this.previousMonthBalance();
     const curr = this.summary().balance;
-    if (prev === 0) return null; // sem base de comparação
+    if (prev === 0) return null;
     const change = ((curr - prev) / Math.abs(prev)) * 100;
     if (change === 0) return { value: 0, direction: 'flat' };
     return { value: Math.abs(change), direction: change > 0 ? 'up' : 'down' };
   });
 
-  // ---- Despesas por categoria -------------------------------------------
   expensesByCategory = computed<CategoryExpense[]>(() => {
-    const expenses = this.monthTransactions().filter((t) => t.type === 'EXPENSE');
+    // O gráfico só considera despesas já pagas
+    const expenses = this.monthTransactions().filter((t) => t.type === 'EXPENSE' && t.isPaid !== false);
     const total = expenses.reduce((a, t) => a + t.amount, 0);
 
     const groups = new Map<string, { id: string; name: string; icon: string; total: number }>();
@@ -167,10 +170,7 @@ export class DashboardComponent {
       }));
   });
 
-  // ---- Donut chart ------------------------------------------------------
-  donutTotal = computed(() =>
-    this.expensesByCategory().reduce((a, c) => a + c.total, 0)
-  );
+  donutTotal = computed(() => this.expensesByCategory().reduce((a, c) => a + c.total, 0));
 
   donutSegments = computed<DonutSegment[]>(() => {
     const radius = 80;
@@ -188,10 +188,9 @@ export class DashboardComponent {
     });
   });
 
-  // ---- Agrupamento por dia ---------------------------------------------
   groupedTransactions = computed<TransactionGroup[]>(() => {
     const list = this.transactions();
-    const groups = new Map<string, any[]>();
+    const groups = new Map<string, Transaction[]>();
     for (const t of list) {
       const key = t.date.slice(0, 10);
       const arr = groups.get(key) ?? [];
@@ -211,78 +210,56 @@ export class DashboardComponent {
       }));
   });
 
-  // ---- Helpers ----------------------------------------------------------
+  confirmPayment(id: number) {
+    this.transactionService.pay(id).subscribe({
+      next: () => {
+        this.notify.success('Transação confirmada com sucesso!');
+        this.refresh$.next(); // Recarrega a lista
+      },
+      error: () => this.notify.error('Erro ao confirmar transação.')
+    });
+  }
+
+  // ... (helpers, previousMonth, nextMonth, formatDateLabel, etc. permanecem iguais)
   private getCurrentMonth(): string {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
-
   private getPreviousMonthKey(): string {
     const [year, month] = this.selectedMonth().split('-').map(Number);
     const date = new Date(year, month - 2);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
-
   private formatDateLabel(dateStr: string): string {
     const [y, m, d] = dateStr.split('-').map(Number);
     const date = new Date(y, m - 1, d);
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const sameDay = (a: Date, b: Date) =>
-      a.getFullYear() === b.getFullYear() &&
-      a.getMonth() === b.getMonth() &&
-      a.getDate() === b.getDate();
+    const sameDay = (a: Date, b: Date) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
     if (sameDay(date, today)) return 'Hoje';
     if (sameDay(date, yesterday)) return 'Ontem';
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
   }
-
-  asId(id: number | string): string {
-    return String(id);
-  }
-
-  onCategoryFilter(value: string) {
-    this.categoryFilter.set(value);
-  }
-
+  asId(id: number | string): string { return String(id); }
+  onCategoryFilter(value: string) { this.categoryFilter.set(value); }
   previousMonth() {
     const [year, month] = this.selectedMonth().split('-').map(Number);
     const date = new Date(year, month - 2);
-    this.selectedMonth.set(
-      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-    );
+    this.selectedMonth.set(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
   }
-
   nextMonth() {
-  const [year, month] = this.selectedMonth().split('-').map(Number);
-  const date = new Date(year, month);
-  this.selectedMonth.set(
-    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-  );
-}
-
-  goToCurrentMonth() {
-    this.selectedMonth.set(this.getCurrentMonth());
+    const [year, month] = this.selectedMonth().split('-').map(Number);
+    const date = new Date(year, month);
+    this.selectedMonth.set(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
   }
-
+  goToCurrentMonth() { this.selectedMonth.set(this.getCurrentMonth()); }
   formatMonthLabel(yearMonth: string): string {
     const [year, month] = yearMonth.split('-').map(Number);
-    return new Date(year, month - 1).toLocaleDateString('pt-BR', {
-      month: 'long',
-      year: 'numeric',
-    });
+    return new Date(year, month - 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   }
-
-  // ---- Delete com modal -------------------------------------------------
-  askDelete(t: { id: number; description: string }) {
-    this.deleteTarget.set({ id: t.id, description: t.description });
-  }
-
-  cancelDelete() {
-    this.deleteTarget.set(null);
-  }
-
+  askDelete(t: { id: number; description: string }) { this.deleteTarget.set({ id: t.id, description: t.description }); }
+  cancelDelete() { this.deleteTarget.set(null); }
   confirmDelete() {
     const target = this.deleteTarget();
     if (!target) return;
