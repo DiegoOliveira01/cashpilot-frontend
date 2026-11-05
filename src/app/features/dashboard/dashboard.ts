@@ -220,7 +220,7 @@ export class DashboardComponent {
     });
   }
 
-  // ... (helpers, previousMonth, nextMonth, formatDateLabel, etc. permanecem iguais)
+  // ... (helpers, previousMonth, nextMonth, formatDateLabel, etc... permanecem iguais)
   private getCurrentMonth(): string {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
