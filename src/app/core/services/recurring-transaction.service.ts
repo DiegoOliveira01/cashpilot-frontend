@@ -16,6 +16,10 @@ export class RecurringTransactionService {
   create(data: RecurringTransactionRequest): Observable<RecurringTransactionResponse> {
     return this.http.post<RecurringTransactionResponse>(this.apiUrl, data);
   }
+  
+  update(id: number, data: RecurringTransactionRequest): Observable<RecurringTransactionResponse> {
+    return this.http.put<RecurringTransactionResponse>(`${this.apiUrl}/${id}`, data);
+  }
 
   toggleActive(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/toggle`, {});
