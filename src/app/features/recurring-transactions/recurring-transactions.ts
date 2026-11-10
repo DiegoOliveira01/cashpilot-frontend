@@ -101,9 +101,9 @@ export class RecurringTransactionsComponent implements OnInit {
       type: rec.type,
       categoryId: rec.categoryId,
       frequency: rec.frequency,
-      firstDayOfMonth: 1, // Pode buscar isso da recorrência se o DTO retornar
-      secondDayOfMonth: null,
-      endDate: null, // Se o DTO retornar, pode preencher
+      firstDayOfMonth: rec.firstDayOfMonth,   
+      secondDayOfMonth: rec.secondDayOfMonth,
+      endDate: null, // Se adicionar no DTO no futuro, coloque aqui
       maxOccurrences: null,
       startDate: rec.startDate
     };

@@ -24,6 +24,8 @@ export interface RecurringTransactionResponse {
   categoryName: string | null;
   categoryIcon: string | null;
   frequency: RecurrenceFrequency;
+  firstDayOfMonth: number | null;
+  secondDayOfMonth: number | null;
   startDate: string;
   nextOccurrenceDate: string;
   isActive: boolean;
