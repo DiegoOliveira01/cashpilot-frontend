@@ -23,7 +23,6 @@ export class RecurringTransactionsComponent implements OnInit {
   categories = signal<Category[]>([]); // Para o select de categoria
   isLoading = signal(true);
 
-  // Controle do Modal de Edição
   isEditModalOpen = signal(false);
   editingId = signal<number | null>(null);
   isSaving = signal(false);
