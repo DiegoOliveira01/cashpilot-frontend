@@ -10,6 +10,8 @@ import { TelegramConnectComponent } from '../../shared/components/telegram-conne
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { RecurringTransactionService } from '../../core/services/recurring-transaction.service';
 import { RecurringTransactionResponse } from '../../core/services/recurring-transaction';
+import { CreditCardService } from '../../core/services/credit-card.service';
+import { CreditCardResponse } from '../../core/services/credit-card';
 
 interface CategoryExpense {
   id: string;
@@ -47,6 +49,7 @@ export class DashboardComponent {
   private transactionService = inject(TransactionService);
   private categoryService = inject(CategoryService);
   private recurringService = inject(RecurringTransactionService);
+  private creditCardService = inject(CreditCardService);
   private notify = inject(NotificationService);
 
   private readonly PALETTE = [
@@ -86,6 +89,11 @@ export class DashboardComponent {
   recurringTransactions = toSignal(
     this.recurringService.getAll().pipe(catchError(() => of([] as RecurringTransactionResponse[]))),
     { initialValue: [] as RecurringTransactionResponse[] }
+  );
+
+  creditCards = toSignal(
+    this.creditCardService.getAll().pipe(catchError(() => of([] as CreditCardResponse[]))),
+    { initialValue: [] as CreditCardResponse[] }
   );
 
   upcomingRecurrences = computed(() => {

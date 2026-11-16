@@ -12,7 +12,7 @@ import { // Import de icones
   lucideGamepad2, lucideAntenna,  lucideBriefcase, lucideLaptop, lucidePiggyBank, lucideGift,
   lucideCarTaxiFront, lucideZap, lucideFactory, lucideLandmark, lucideHeartPulse, lucideGraduationCap, lucidePlane,
   lucideRepeat, lucideDumbbell, lucideSmartphone, lucideCoffee, lucideArrowDownLeft, lucideArrowUpRight,
-  lucideTag
+  lucideTag, lucideCalendar, lucideCheckCircle
 } from '@ng-icons/lucide';
 
 /**
@@ -45,7 +45,7 @@ import { // Import de icones
       lucideGamepad2, lucideAntenna,  lucideBriefcase, lucideLaptop, lucidePiggyBank, lucideGift,
       lucideCarTaxiFront, lucideZap, lucideFactory, lucideLandmark, lucideHeartPulse, lucideGraduationCap, lucidePlane,
       lucideRepeat, lucideDumbbell, lucideSmartphone, lucideCoffee, lucideArrowDownLeft, lucideArrowUpRight,
-      lucideTag
+      lucideTag, lucideCalendar, lucideCheckCircle
     })
   ],
   template: `<ng-icon [name]="name" />`,

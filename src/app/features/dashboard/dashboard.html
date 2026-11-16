@@ -8,10 +8,17 @@
         <p class="text-gray-400 text-sm mt-1">Visão geral das suas finanças</p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
+
+        <app-telegram-connect />
+
         <a routerLink="/categories" class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
           Categorias
         </a>
-        <app-telegram-connect />
+
+        <a routerLink="/cards" class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+          Cartões
+        </a>
+
         <button routerLink="/transactions/new" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
           + Nova Transação
         </button>
@@ -185,6 +192,49 @@
         </div>
       </div>
     }
+
+      <!-- ================= Meus Cartões ================= -->
+      @if (creditCards().length > 0) {
+      <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 mb-8">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-white font-semibold">Meus Cartões</h2>
+          <a routerLink="/cards" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition">Gerenciar →</a>
+        </div>
+      
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          @for (card of creditCards(); track card.id) {
+          <div
+            class="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-700/50 group hover:scale-[1.02] transition-transform cursor-pointer"
+            [style.background-image]="'url(' + card.imageUrl + ')'"
+            style="background-size: cover; background-position: center;" routerLink="/cards">
+      
+            <!-- Overlay escuro para garantir a leitura -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+      
+            <!-- Conteúdo -->
+            <div class="absolute inset-0 p-4 flex flex-col justify-between text-white">
+              <div class="flex justify-between items-start">
+                <h3 class="text-base font-bold tracking-wide">{{ card.name }}</h3>
+                <span class="text-[10px] font-semibold px-2 py-0.5 bg-white/20 backdrop-blur-md rounded">{{ card.brand
+                  }}</span>
+              </div>
+      
+              <div>
+                <p class="text-[10px] text-gray-300 uppercase tracking-wider mb-0.5">Limite Total</p>
+                <p class="text-sm font-semibold mb-2">R$ {{ card.limitAmount | number:'1.2-2' }}</p>
+      
+                <div class="flex items-center gap-3 text-[10px] text-gray-300">
+                  <span>Fecha dia {{ card.closingDay }}</span>
+                  <span>•</span>
+                  <span>Vence dia {{ card.dueDay }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
 
     <!-- ================= Despesas por categoria ================= -->
     @if (expensesByCategory().length > 0) {

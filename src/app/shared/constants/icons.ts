@@ -44,4 +44,6 @@ export const AVAILABLE_ICONS: IconOption[] = [
   { name: 'lucideCoffee', label: 'Café' },
   { name: 'lucideArrowDownLeft', label: 'Entrada' },
   { name: 'lucideArrowUpRight', label: 'Saída' },
+  { name: 'lucideCalendar', label: 'Calendario' },
+  { name: 'lucideCheckCircle', label: 'Check' },
 ];

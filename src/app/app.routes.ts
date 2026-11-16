@@ -30,13 +30,18 @@ export const routes: Routes = [
     component: CategoriesComponent,
   },
 
-
   {
     path: 'recurring',
     canActivate: [authGuard],
     loadComponent: () => 
       import('./features/recurring-transactions/recurring-transactions')
         .then(m => m.RecurringTransactionsComponent)
+  },
+
+  {
+    path: 'cards',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/credit-cards/cards').then(m => m.CreditCardsComponent)
   },
 
   {
