@@ -39,7 +39,7 @@ export class CreditCardsComponent implements OnInit {
 
   form: CreditCardRequest = {
     name: '',
-    brand: 'Visa',
+    brand: 'Nubank',
     closingDay: 25,
     dueDay: 5,
     limitAmount: 0,
